@@ -12,6 +12,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.send("Finance API Running 🚀");
+});
+
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/records', recordRoutes);
