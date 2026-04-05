@@ -1,6 +1,6 @@
 import Record from '../models/record.model.js';
 
-
+import mongoose from 'mongoose';
 
 import User from '../models/user.model.js';
 
@@ -40,6 +40,12 @@ export const createRecord = async (req, res) => {
           message: 'User not found'
         });
       }
+
+      if (user.role !== 'viewer') {
+  return res.status(400).json({
+    message: 'Records can only be assigned to viewers'
+  });
+}
 
       recordUser = user._id;
     } else {
@@ -143,7 +149,7 @@ export const getRecords = async (req, res) => {
       .skip(skip)
       .limit(pageSize);
 
-    // ✅ Response (clean + professional)
+    
     res.status(200).json({
       totalRecords,
       currentPage: pageNumber,
@@ -163,16 +169,19 @@ export const getRecords = async (req, res) => {
 
 
 
+
 export const updateRecord = async (req, res) => {
   try {
-    // 🔐 Only admin allowed
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({
-        message: 'Only admin can update records'
+    const { id } = req.params;
+
+    
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: 'Invalid record ID'
       });
     }
-
-    const record = await Record.findById(req.params.id);
+      
+    const record = await Record.findById(id);
 
     if (!record) {
       return res.status(404).json({
@@ -180,14 +189,6 @@ export const updateRecord = async (req, res) => {
       });
     }
 
-    // ✅ Validate type
-    if (req.body.type && !['income', 'expense'].includes(req.body.type)) {
-      return res.status(400).json({
-        message: 'Type must be income or expense'
-      });
-    }
-
-    // ✅ Update fields
     record.amount = req.body.amount ?? record.amount;
     record.type = req.body.type ?? record.type;
     record.category = req.body.category ?? record.category;
@@ -199,23 +200,24 @@ export const updateRecord = async (req, res) => {
     res.json(updatedRecord);
 
   } catch (error) {
-    console.error('Update Error:', error.message);
+    console.error("Update Error:", error.message); // 🔥 show real error
 
     res.status(500).json({
-      message: 'Error updating record'
+      message: 'Error updating record',
+      error: error.message
     });
   }
 };
 
 
 
-import mongoose from 'mongoose';
+
 
 export const deleteRecord = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 🔥 Validate ID
+  
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         message: 'Invalid record ID'
@@ -230,13 +232,6 @@ export const deleteRecord = async (req, res) => {
       });
     }
 
-    // ✅ Only admin
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({
-        message: 'Only admin can delete records'
-      });
-    }
-
     await record.deleteOne();
 
     res.json({
@@ -244,7 +239,7 @@ export const deleteRecord = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Delete Error:', error); 
+    console.error("Delete Error:", error.message); // 🔥 show real error
 
     res.status(500).json({
       message: 'Error deleting record',
