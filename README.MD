@@ -109,20 +109,11 @@ JWT_SECRET=pra1234
     npm run dev
 
 
-##  Postman Collection
-
-  collection Link :
-
-
-https://kakdeprasad099-4542886.postman.co/workspace/Personal-Workspace~bd210a14-fe12-4f7b-8218-0a1839ffb3a0/collection/48439439-0f9f5b2c-da3b-486a-b3a8-1cbca1899be6?action=share&source=copy-link&creator=48439439
-
-
 ##  API Documentation
 
      published API docs link:
 
 https://documenter.getpostman.com/view/48439439/2sBXiqEoew
-
 
 
 ##  Live API (Deployed)
